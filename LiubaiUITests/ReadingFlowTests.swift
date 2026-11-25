@@ -130,6 +130,43 @@ final class ReadingFlowTests: XCTestCase {
         XCTAssertEqual(like.label, "取消喜欢")
     }
 
+    func testStyleConfirmationReordersUpcomingArticlesAndPersists() {
+        let app = readingApp()
+        app.launch()
+
+        let current = app.buttons["reading.cover.return-to-now"]
+        let style = app.buttons["reading.style"]
+        XCTAssertTrue(current.waitForExistence(timeout: 8))
+        XCTAssertEqual(style.value as? String, "均衡阅读")
+        XCTAssertFalse(app.staticTexts["1 / 5"].exists)
+
+        style.tap()
+        let psychology = app.buttons["reading.style.psychology"]
+        XCTAssertTrue(psychology.waitForExistence(timeout: 5))
+        psychology.tap()
+        app.buttons["reading.style.cancel"].tap()
+        XCTAssertEqual(style.value as? String, "均衡阅读")
+
+        style.tap()
+        psychology.tap()
+        app.buttons["reading.style.confirm"].tap()
+        XCTAssertEqual(style.value as? String, "心理觉察")
+        XCTAssertTrue(current.isHittable)
+
+        app.scrollViews["reading.feed"].swipeUp()
+        let preferred = app.buttons["reading.cover.name-the-feeling"]
+        XCTAssertTrue(preferred.waitForExistence(timeout: 5))
+        XCTAssertTrue(preferred.isHittable)
+        app.buttons["reading.next"].tap()
+        app.buttons["reading.next"].tap()
+        XCTAssertTrue(app.buttons["reading.cover.circle-of-choice"].isHittable)
+
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(style.waitForExistence(timeout: 8))
+        XCTAssertEqual(style.value as? String, "心理觉察")
+    }
+
     func testEmptyResponseOffersRetryWithoutBundledArticles() {
         let app = readingApp(response: "[]")
         app.launch()

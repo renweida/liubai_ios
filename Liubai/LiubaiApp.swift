@@ -6,15 +6,18 @@ struct LiubaiApp: App {
     @State private var feed = ArticleFeed()
     @State private var tips = TipStore()
     @AppStorage("appearance") private var appearance = Appearance.system
+    private let preferences: UserDefaults
 
     init() {
         #if DEBUG
         if let value = ProcessInfo.processInfo.environment["LIUBAI_UI_TEST_LIBRARY"], let id = UUID(uuidString: value) {
             _library = State(initialValue: ReadingStore(directory: URL.temporaryDirectory.appending(path: id.uuidString)))
+            preferences = UserDefaults(suiteName: "LiubaiUITests.\(id.uuidString)") ?? .standard
             return
         }
         #endif
         _library = State(initialValue: ReadingStore())
+        preferences = .standard
     }
 
     var body: some Scene {
@@ -23,6 +26,7 @@ struct LiubaiApp: App {
                 .environment(library)
                 .environment(feed)
                 .environment(tips)
+                .defaultAppStorage(preferences)
                 .preferredColorScheme(appearance.colorScheme)
                 .tint(ReadingPalette.accent)
                 .task { await feed.refresh() }

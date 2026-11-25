@@ -103,3 +103,70 @@ struct Article: Identifiable, Hashable, Codable {
         return data
     }
 }
+
+enum ReadingStyle: String, CaseIterable, Identifiable {
+    case balanced, philosophy, psychology, comfort
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .balanced: "均衡阅读"
+        case .philosophy: "哲学思辨"
+        case .psychology: "心理觉察"
+        case .comfort: "温柔疗愈"
+        }
+    }
+
+    var detail: String {
+        switch self {
+        case .balanced: "按推荐顺序浏览全部主题"
+        case .philosophy: "多读关于选择、意义与生活的思考"
+        case .psychology: "多读关于情绪、关系与行为的知识"
+        case .comfort: "多读自我关怀、正念与接纳类文章"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .balanced: "square.grid.2x2"
+        case .philosophy: "quote.opening"
+        case .psychology: "brain.head.profile"
+        case .comfort: "heart"
+        }
+    }
+
+    func prioritized(_ articles: [Article]) -> [Article] {
+        guard self != .balanced else { return articles }
+        var preferred: [Article] = []
+        var other: [Article] = []
+        for article in articles {
+            if matches(article) { preferred.append(article) }
+            else { other.append(article) }
+        }
+
+        // 每两篇偏好内容插入一篇其他内容，保留各组的服务端顺序。
+        var alternatives = other.makeIterator()
+        var result: [Article] = []
+        for (index, article) in preferred.enumerated() {
+            result.append(article)
+            if index.isMultiple(of: 2) == false, let alternative = alternatives.next() {
+                result.append(alternative)
+            }
+        }
+        while let alternative = alternatives.next() { result.append(alternative) }
+        return result
+    }
+
+    private func matches(_ article: Article) -> Bool {
+        switch self {
+        case .balanced: return true
+        case .philosophy: return article.category.contains("哲学")
+        case .psychology: return article.category.contains("心理")
+        case .comfort:
+            let topics = ["当下", "情绪", "善待", "关怀", "接纳", "疗愈", "正念", "压力", "焦虑", "松弛", "休息"]
+            let keywords = [article.category, article.theme, article.displayTitle]
+            return topics.contains { topic in keywords.contains { $0.contains(topic) } }
+        }
+    }
+}

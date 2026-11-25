@@ -5,13 +5,16 @@ struct FeedView: View {
     @Environment(ReadingStore.self) private var library
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Binding var appearance: Appearance
+    @AppStorage("readingStyle") private var style = ReadingStyle.balanced
+    @State private var articles: [Article] = []
     @State private var activeID: String?
+    @State private var showingStyles = false
     @State private var openedArticle: Article?
     @State private var collectingArticle: Article?
     @State private var error: String?
 
     private var index: Int {
-        feed.articles.firstIndex(where: { $0.id == activeID }) ?? 0
+        articles.firstIndex(where: { $0.id == activeID }) ?? 0
     }
 
     var body: some View {
@@ -23,7 +26,7 @@ struct FeedView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .ready:
                 pages
-                if feed.articles.count > 1 { pager }
+                if articles.count > 1 { nextButton }
             case .empty:
                 feedMessage("暂时没有文章", symbol: "book.closed", detail: "稍后再来看看。")
             case .failed(let detail):
@@ -35,8 +38,12 @@ struct FeedView: View {
         .toolbarVisibility(.hidden, for: .navigationBar)
         .navigationDestination(item: $openedArticle) { ArticleView(article: $0) }
         .sheet(item: $collectingArticle) { CollectionSheet(article: $0) }
+        .sheet(isPresented: $showingStyles) {
+            ReadingStyleSheet(style: style, onConfirm: applyStyle)
+        }
         .onChange(of: feed.articles, initial: true) { _, newArticles in
-            activeID = newArticles.first?.id
+            articles = style.prioritized(newArticles)
+            activeID = articles.first?.id
         }
         .task { if let storageError = library.storageError { error = storageError } }
         .messageAlert($error)
@@ -46,7 +53,7 @@ struct FeedView: View {
         GeometryReader { geometry in
             ScrollView(.vertical) {
                 LazyVStack(spacing: 0) {
-                    ForEach(Array(feed.articles.enumerated()), id: \.element.id) { index, article in
+                    ForEach(Array(articles.enumerated()), id: \.element.id) { index, article in
                         preview(article, index: index, height: geometry.size.height)
                             .frame(height: geometry.size.height)
                             .id(article.id)
@@ -71,7 +78,22 @@ struct FeedView: View {
             Text("留白")
                 .font(ReadingPalette.editorial(32, relativeTo: .title2))
                 .accessibilityAddTraits(.isHeader)
+                .lineLimit(1)
             Spacer()
+            Button {
+                showingStyles = true
+            } label: {
+                Label("内容风格", systemImage: "slider.horizontal.3")
+                    .font(.caption.weight(.semibold))
+                    .lineLimit(1)
+                    .foregroundStyle(style == .balanced ? ReadingPalette.ink : ReadingPalette.accent)
+                    .padding(.horizontal, 12)
+                    .frame(minHeight: 44)
+            }
+            .buttonStyle(.plain)
+            .glassEffect(.regular.interactive(), in: .capsule)
+            .accessibilityValue(style.title)
+            .accessibilityIdentifier("reading.style")
             Menu {
                 Picker("外观", selection: $appearance) {
                     ForEach(Appearance.allCases) { mode in
@@ -94,22 +116,26 @@ struct FeedView: View {
         .padding(.bottom, 10)
     }
 
-    private var pager: some View {
-        HStack {
-            Spacer()
-            Button {
-                move(by: index == feed.articles.count - 1 ? -index : 1)
-            } label: {
-                Label(index == feed.articles.count - 1 ? "回到第一篇" : "上滑切换",
-                      systemImage: index == feed.articles.count - 1 ? "arrow.counterclockwise" : "chevron.up")
-                    .labelStyle(.titleAndIcon)
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(ReadingPalette.muted)
-                    .frame(minHeight: 44)
+    private var nextButton: some View {
+        let isLast = index == articles.count - 1
+        return Button {
+            if isLast {
+                articles = style.prioritized(feed.articles)
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.28)) {
+                    activeID = articles.first?.id
+                }
+            } else {
+                move(by: 1)
             }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("reading.next")
+        } label: {
+            Label(isLast ? "回到第一篇" : "下一篇", systemImage: isLast ? "arrow.counterclockwise" : "chevron.up")
+                .font(.caption.weight(.medium))
+                .foregroundStyle(ReadingPalette.muted)
+                .frame(minHeight: 44)
         }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("reading.next")
+        .frame(maxWidth: .infinity, alignment: .trailing)
         .padding(.horizontal, 24)
     }
 
@@ -126,11 +152,22 @@ struct FeedView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
+    private func applyStyle(_ selection: ReadingStyle) {
+        guard selection != style else { return }
+        style = selection
+        guard !articles.isEmpty else { return }
+
+        let visible = Array(articles.prefix(index + 1))
+        let visibleIDs = Set(visible.map(\.id))
+        let remaining = feed.articles.filter { !visibleIDs.contains($0.id) }
+        articles = visible + selection.prioritized(remaining)
+    }
+
     private func move(by amount: Int) {
         let target = index + amount
-        guard feed.articles.indices.contains(target) else { return }
+        guard articles.indices.contains(target) else { return }
         withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.28)) {
-            activeID = feed.articles[target].id
+            activeID = articles[target].id
         }
     }
 
@@ -203,6 +240,89 @@ struct FeedView: View {
         .padding(.horizontal, 24)
         .padding(.top, 5)
         .padding(.bottom, 5)
+    }
+}
+
+private struct ReadingStyleSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @State var style: ReadingStyle
+    let onConfirm: (ReadingStyle) -> Void
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("内容风格")
+                    .font(ReadingPalette.editorial(27, relativeTo: .title2))
+                    .accessibilityAddTraits(.isHeader)
+                    .padding(.bottom, 6)
+                ForEach(ReadingStyle.allCases) { option in
+                    styleRow(option)
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 24)
+            .readingWidth()
+        }
+        .scrollBounceBehavior(.basedOnSize)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            HStack(spacing: 12) {
+                Button {
+                    dismiss()
+                } label: {
+                    Text("取消").frame(maxWidth: .infinity, minHeight: 34)
+                }
+                .buttonStyle(.glass)
+                .accessibilityIdentifier("reading.style.cancel")
+
+                Button {
+                    onConfirm(style)
+                    dismiss()
+                } label: {
+                    Text("确定").frame(maxWidth: .infinity, minHeight: 34)
+                }
+                .buttonStyle(.glassProminent)
+                .accessibilityIdentifier("reading.style.confirm")
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 8)
+            .readingWidth()
+            .background(ReadingPalette.paper)
+        }
+        .readingBackground()
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+    }
+
+    private func styleRow(_ option: ReadingStyle) -> some View {
+        let isSelected = style == option
+        return Button {
+            style = option
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: option.symbol)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(ReadingPalette.accent)
+                    .frame(width: 24)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(option.title).font(.subheadline.weight(.semibold))
+                    Text(option.detail).font(.caption).foregroundStyle(ReadingPalette.muted)
+                }
+                Spacer(minLength: 8)
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(isSelected ? ReadingPalette.accent : ReadingPalette.muted)
+                    .accessibilityHidden(true)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .frame(minHeight: 46)
+            .background(isSelected ? ReadingPalette.quiet : Color.clear, in: .rect(cornerRadius: 12))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .accessibilityIdentifier("reading.style.\(option.rawValue)")
     }
 }
 
