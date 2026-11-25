@@ -17,35 +17,52 @@ struct FeedView: View {
     var body: some View {
         VStack(spacing: 0) {
             header
-            GeometryReader { geometry in
-                ScrollView(.vertical) {
-                    LazyVStack(spacing: 0) {
-                        ForEach(Array(feed.articles.enumerated()), id: \.element.id) { index, article in
-                            preview(article, index: index, height: geometry.size.height)
-                                .frame(height: geometry.size.height)
-                                .id(article.id)
-                        }
-                    }
-                    .scrollTargetLayout()
-                }
-                .scrollIndicators(.hidden)
-                .scrollTargetBehavior(.paging)
-                .scrollPosition(id: $activeID)
-                .accessibilityIdentifier("reading.feed")
-                .accessibilityScrollAction { direction in
-                    if direction == .top { move(by: 1) }
-                    if direction == .bottom { move(by: -1) }
-                }
+            switch feed.state {
+            case .idle, .loading:
+                ProgressView("正在加载文章")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            case .ready:
+                pages
+                if feed.articles.count > 1 { pager }
+            case .empty:
+                feedMessage("暂时没有文章", symbol: "book.closed", detail: "稍后再来看看。")
+            case .failed(let detail):
+                feedMessage("文章加载失败", symbol: "exclamationmark.circle", detail: detail)
             }
-            pager
         }
         .readingWidth()
         .readingBackground()
         .toolbarVisibility(.hidden, for: .navigationBar)
         .navigationDestination(item: $openedArticle) { ArticleView(article: $0) }
         .sheet(item: $collectingArticle) { CollectionSheet(article: $0) }
+        .onChange(of: feed.articles, initial: true) { _, newArticles in
+            activeID = newArticles.first?.id
+        }
         .task { if let storageError = library.storageError { error = storageError } }
         .messageAlert($error)
+    }
+
+    private var pages: some View {
+        GeometryReader { geometry in
+            ScrollView(.vertical) {
+                LazyVStack(spacing: 0) {
+                    ForEach(Array(feed.articles.enumerated()), id: \.element.id) { index, article in
+                        preview(article, index: index, height: geometry.size.height)
+                            .frame(height: geometry.size.height)
+                            .id(article.id)
+                    }
+                }
+                .scrollTargetLayout()
+            }
+            .scrollIndicators(.hidden)
+            .scrollTargetBehavior(.paging)
+            .scrollPosition(id: $activeID)
+            .accessibilityIdentifier("reading.feed")
+            .accessibilityScrollAction { direction in
+                if direction == .top { move(by: 1) }
+                if direction == .bottom { move(by: -1) }
+            }
+        }
     }
 
     private var header: some View {
@@ -94,6 +111,19 @@ struct FeedView: View {
             .accessibilityIdentifier("reading.next")
         }
         .padding(.horizontal, 24)
+    }
+
+    private func feedMessage(_ title: String, symbol: String, detail: String) -> some View {
+        ContentUnavailableView {
+            Label(title, systemImage: symbol)
+        } description: {
+            Text(detail)
+        } actions: {
+            Button("重新加载") { Task { await feed.refresh() } }
+                .buttonStyle(.glass)
+                .accessibilityIdentifier("reading.retry")
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func move(by amount: Int) {
