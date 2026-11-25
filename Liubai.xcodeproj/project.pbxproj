@@ -1,0 +1,391 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		000000000000000000000002 /* ArticleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000001 /* ArticleView.swift */; };
+		000000000000000000000004 /* Articles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000003 /* Articles.swift */; };
+		000000000000000000000006 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000005 /* FeedView.swift */; };
+		000000000000000000000008 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000007 /* LibraryView.swift */; };
+		00000000000000000000000A /* LiubaiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000009 /* LiubaiApp.swift */; };
+		00000000000000000000000C /* NoteEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000000B /* NoteEditor.swift */; };
+		00000000000000000000000E /* NoteMarkup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000000D /* NoteMarkup.swift */; };
+		000000000000000000000010 /* ReadingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000000F /* ReadingStore.swift */; };
+		000000000000000000000012 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000011 /* SettingsView.swift */; };
+		000000000000000000000014 /* Tips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000013 /* Tips.swift */; };
+		000000000000000000000016 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000015 /* Assets.xcassets */; };
+		000000000000000000000018 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000017 /* PrivacyInfo.xcprivacy */; };
+		00000000000000000000001A /* SourceHanSerifCN-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000019 /* SourceHanSerifCN-Medium.otf */; };
+		00000000000000000000001C /* SourceHanSerif-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000001B /* SourceHanSerif-LICENSE.txt */; };
+		00000000000000000000002A /* ReadingFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000029 /* ReadingFlowTests.swift */; };
+		00000000000000000000002B /* Tips.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000001D /* Tips.storekit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		00000000000000000000002F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 00000000000000000000002E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 000000000000000000000028;
+			remoteInfo = Liubai;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		000000000000000000000001 /* ArticleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleView.swift; sourceTree = "<group>"; };
+		000000000000000000000003 /* Articles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Articles.swift; sourceTree = "<group>"; };
+		000000000000000000000005 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
+		000000000000000000000007 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
+		000000000000000000000009 /* LiubaiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiubaiApp.swift; sourceTree = "<group>"; };
+		00000000000000000000000B /* NoteEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditor.swift; sourceTree = "<group>"; };
+		00000000000000000000000D /* NoteMarkup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteMarkup.swift; sourceTree = "<group>"; };
+		00000000000000000000000F /* ReadingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingStore.swift; sourceTree = "<group>"; };
+		000000000000000000000011 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		000000000000000000000013 /* Tips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tips.swift; sourceTree = "<group>"; };
+		000000000000000000000015 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		000000000000000000000017 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		000000000000000000000019 /* SourceHanSerifCN-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceHanSerifCN-Medium.otf"; sourceTree = "<group>"; };
+		00000000000000000000001B /* SourceHanSerif-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "SourceHanSerif-LICENSE.txt"; sourceTree = "<group>"; };
+		00000000000000000000001D /* Tips.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Tips.storekit; sourceTree = "<group>"; };
+		00000000000000000000001E /* Liubai.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Liubai.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000020 /* LiubaiUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LiubaiUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000029 /* ReadingFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingFlowTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		000000000000000000000026 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		00000000000000000000001F /* Liubai */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000001 /* ArticleView.swift */,
+				000000000000000000000003 /* Articles.swift */,
+				000000000000000000000005 /* FeedView.swift */,
+				000000000000000000000007 /* LibraryView.swift */,
+				000000000000000000000009 /* LiubaiApp.swift */,
+				00000000000000000000000B /* NoteEditor.swift */,
+				00000000000000000000000D /* NoteMarkup.swift */,
+				00000000000000000000000F /* ReadingStore.swift */,
+				000000000000000000000011 /* SettingsView.swift */,
+				000000000000000000000013 /* Tips.swift */,
+				000000000000000000000015 /* Assets.xcassets */,
+				000000000000000000000017 /* PrivacyInfo.xcprivacy */,
+				000000000000000000000019 /* SourceHanSerifCN-Medium.otf */,
+				00000000000000000000001B /* SourceHanSerif-LICENSE.txt */,
+			);
+			path = Liubai;
+			sourceTree = "<group>";
+		};
+		000000000000000000000021 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				00000000000000000000001E /* Liubai.app */,
+				000000000000000000000020 /* LiubaiUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		000000000000000000000022 /* LiubaiUITests */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000029 /* ReadingFlowTests.swift */,
+			);
+			path = LiubaiUITests;
+			sourceTree = "<group>";
+		};
+		000000000000000000000023 = {
+			isa = PBXGroup;
+			children = (
+				00000000000000000000001F /* Liubai */,
+				000000000000000000000022 /* LiubaiUITests */,
+				00000000000000000000001D /* Tips.storekit */,
+				000000000000000000000021 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		000000000000000000000028 /* Liubai */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000000000027 /* Build configuration list for PBXNativeTarget "Liubai" */;
+			buildPhases = (
+				000000000000000000000024 /* Sources */,
+				000000000000000000000026 /* Frameworks */,
+				000000000000000000000025 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Liubai;
+			productName = Liubai;
+			productReference = 00000000000000000000001E /* Liubai.app */;
+			productType = "com.apple.product-type.application";
+		};
+		000000000000000000000032 /* LiubaiUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000000000031 /* Build configuration list for PBXNativeTarget "LiubaiUITests" */;
+			buildPhases = (
+				00000000000000000000002C /* Sources */,
+				00000000000000000000002D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				000000000000000000000030 /* PBXTargetDependency */,
+			);
+			name = LiubaiUITests;
+			productName = LiubaiUITests;
+			productReference = 000000000000000000000020 /* LiubaiUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		00000000000000000000002E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 2620;
+			};
+			buildConfigurationList = 000000000000000000000033 /* Build configuration list for PBXProject "Liubai" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = "zh-Hans";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				"zh-Hans",
+				en,
+				Base,
+			);
+			mainGroup = 000000000000000000000023;
+			productRefGroup = 000000000000000000000021 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				000000000000000000000028 /* Liubai */,
+				000000000000000000000032 /* LiubaiUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		000000000000000000000025 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000000000000000000000016 /* Assets.xcassets in Resources */,
+				000000000000000000000018 /* PrivacyInfo.xcprivacy in Resources */,
+				00000000000000000000001A /* SourceHanSerifCN-Medium.otf in Resources */,
+				00000000000000000000001C /* SourceHanSerif-LICENSE.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		00000000000000000000002D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				00000000000000000000002B /* Tips.storekit in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		000000000000000000000024 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000000000000000000000002 /* ArticleView.swift in Sources */,
+				000000000000000000000004 /* Articles.swift in Sources */,
+				000000000000000000000006 /* FeedView.swift in Sources */,
+				000000000000000000000008 /* LibraryView.swift in Sources */,
+				00000000000000000000000A /* LiubaiApp.swift in Sources */,
+				00000000000000000000000C /* NoteEditor.swift in Sources */,
+				00000000000000000000000E /* NoteMarkup.swift in Sources */,
+				000000000000000000000010 /* ReadingStore.swift in Sources */,
+				000000000000000000000012 /* SettingsView.swift in Sources */,
+				000000000000000000000014 /* Tips.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		00000000000000000000002C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				00000000000000000000002A /* ReadingFlowTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		000000000000000000000030 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 000000000000000000000028 /* Liubai */;
+			targetProxy = 00000000000000000000002F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		000000000000000000000034 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		000000000000000000000035 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		000000000000000000000036 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARTICLE_FEED_URL = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7688M45QXT;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_EXPAND_BUILD_SETTINGS = YES;
+				INFOPLIST_FILE = Liubai/SupportingInfo.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "留白";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.liubai.reader;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		000000000000000000000037 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARTICLE_FEED_URL = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7688M45QXT;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_EXPAND_BUILD_SETTINGS = YES;
+				INFOPLIST_FILE = Liubai/SupportingInfo.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "留白";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.liubai.reader;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		000000000000000000000038 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = app.liubai.reader.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Liubai;
+			};
+			name = Debug;
+		};
+		000000000000000000000039 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = app.liubai.reader.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Liubai;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		000000000000000000000027 /* Build configuration list for PBXNativeTarget "Liubai" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000000036 /* Debug */,
+				000000000000000000000037 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		000000000000000000000031 /* Build configuration list for PBXNativeTarget "LiubaiUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000000038 /* Debug */,
+				000000000000000000000039 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		000000000000000000000033 /* Build configuration list for PBXProject "Liubai" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000000034 /* Debug */,
+				000000000000000000000035 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 00000000000000000000002E /* Project object */;
+}

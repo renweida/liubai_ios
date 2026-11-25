@@ -1,0 +1,15 @@
+.DS_Store
+
+# Xcode 个人工作区状态和构建产物
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+.build/
+
+# 本地配置和签名文件
+.env
+.env.*
+!.env.example
+*.mobileprovision
+*.p12

@@ -1,0 +1,77 @@
+{
+  "identifier": "56982477-99C4-4FFE-A101-F9EE5BEDF916",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "0.99",
+      "familyShareable": false,
+      "internalID": "1000000001",
+      "localizations": [
+        {
+          "description": "支持留白的开发",
+          "displayName": "小额打赏",
+          "locale": "zh_CN"
+        },
+        {
+          "description": "Support the development of Liubai",
+          "displayName": "Small Tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "app.liubai.reader.tip.small",
+      "referenceName": "小额打赏",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "1000000002",
+      "localizations": [
+        {
+          "description": "支持留白的开发",
+          "displayName": "中额打赏",
+          "locale": "zh_CN"
+        },
+        {
+          "description": "Support the development of Liubai",
+          "displayName": "Medium Tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "app.liubai.reader.tip.medium",
+      "referenceName": "中额打赏",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "4.99",
+      "familyShareable": false,
+      "internalID": "1000000003",
+      "localizations": [
+        {
+          "description": "支持留白的开发",
+          "displayName": "大额打赏",
+          "locale": "zh_CN"
+        },
+        {
+          "description": "Support the development of Liubai",
+          "displayName": "Large Tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "app.liubai.reader.tip.large",
+      "referenceName": "大额打赏",
+      "type": "Consumable"
+    }
+  ],
+  "settings": {
+    "_failTransactionsEnabled": false,
+    "_locale": "zh_CN",
+    "_storefront": "CHN",
+    "_storeKitErrors": []
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 3,
+    "minor": 0
+  }
+}
