@@ -14,11 +14,20 @@
 
 ## 接入文章 API
 
-在 App target 的 Build Settings 中将 `ARTICLE_FEED_URL` 设置为完整的 HTTPS 文章接口地址。服务端接口返回 JSON 数组，示例如下。
+在 App target 的 Build Settings 中将 `ARTICLE_FEED_URL` 设置为完整的 HTTPS 地址，例如 `https://你的域名/api/v1/articles`。
+
+首页每次请求一篇文章。首次请求只传 `style`，后续请求同时传服务端上次返回的 `nextCursor`。风格值为 `balanced`（均衡阅读）、`philosophy`（哲学思辨）、`psychology`（心理觉察）和 `comfort`（温柔疗愈）。
+
+```http
+GET /api/v1/articles?style=psychology
+GET /api/v1/articles?style=psychology&cursor=eyJwIjoyfQ
+```
+
+用 HTTP 200 返回一个文章对象和下一页游标。最后一篇将 `nextCursor` 设为 `null`。当前请求无文章可返回时使用 HTTP 204，响应体留空。游标使用 URL 安全字符，同一风格下按服务端排序逐篇推进。
 
 ```json
-[
-  {
+{
+  "article": {
     "id": "return-to-now",
     "category": "心理学",
     "theme": "当下",
@@ -28,11 +37,14 @@
     "minutes": 3,
     "source": "AI 生成",
     "markdown": "## 觉察从哪里开始\n\n感受此刻正在发生的一件事。"
-  }
-]
+  },
+  "nextCursor": "eyJwIjoyfQ"
+}
 ```
 
-`id` 必须唯一且稳定。标题无需分行时将 `subtitle` 设为空字符串。服务端数组顺序是「均衡阅读」的顺序。客户端根据文章分类、主题和标题调整推荐顺序，风格偏好、喜欢、收藏和笔记都保存在本机。首次加载失败时，可以在首页重试。
+服务端负责按风格推荐。客户端切换风格时重启该风格的游标序列，保留眼前和此前的文章，并在本机跳过重复 ID。风格偏好、喜欢、收藏和笔记都保存在本机。首页预取下一篇，加载失败时可以重试。
+
+书架通过 `GET /api/v1/articles/{id}` 获取未在本次会话中读取的正文。用 HTTP 200 直接返回同结构的单个文章对象，找不到文章时返回 HTTP 404。`id` 必须唯一且稳定，标题无需分行时将 `subtitle` 设为空字符串。两种接口的单次响应体最多为 8,000,000 字节。
 
 ## 打赏
 

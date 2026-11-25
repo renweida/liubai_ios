@@ -29,7 +29,6 @@ struct LiubaiApp: App {
                 .defaultAppStorage(preferences)
                 .preferredColorScheme(appearance.colorScheme)
                 .tint(ReadingPalette.accent)
-                .task { await feed.refresh() }
                 .task { await tips.observeTransactions() }
         }
     }

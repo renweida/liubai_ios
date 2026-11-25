@@ -5,7 +5,7 @@ final class ReadingFlowTests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
 
     func testPagingAndPrivateReadingDataSurviveRelaunch() throws {
-        let app = readingApp()
+        let app = try readingApp()
         app.launchArguments = ["-appearance", "light"]
         app.launch()
 
@@ -54,12 +54,16 @@ final class ReadingFlowTests: XCTestCase {
         XCTAssertTrue(app.buttons["article.note"].waitForExistence(timeout: 5))
 
         app.terminate()
+        try installResponses(try articleResponses(firstPageOnly: true), in: app)
         app.launch()
 
         app.tabBars.buttons["书架"].tap()
         XCTAssertTrue(app.staticTexts["Read again"].waitForExistence(timeout: 5))
         app.buttons["喜欢"].tap()
         XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "分清你能决定的事")).firstMatch.exists)
+        app.buttons["library.article.circle-of-choice"].tap()
+        XCTAssertTrue(app.scrollViews["article.content"].waitForExistence(timeout: 5))
+        app.navigationBars["阅读"].buttons.firstMatch.tap()
         app.buttons["笔记"].tap()
         let preview = app.buttons.containing(NSPredicate(format: "label CONTAINS %@", "Focus today")).firstMatch
         XCTAssertTrue(preview.waitForExistence(timeout: 5))
@@ -74,7 +78,7 @@ final class ReadingFlowTests: XCTestCase {
         store.clearTransactions()
         store.disableDialogs = true
 
-        let app = readingApp()
+        let app = try readingApp()
         app.launchArguments = ["-appearance", "dark"]
         app.launch()
         XCTAssertTrue(app.buttons["reading.open"].firstMatch.waitForExistence(timeout: 8))
@@ -92,7 +96,7 @@ final class ReadingFlowTests: XCTestCase {
     }
 
     func testBackupFileRoundTrip() throws {
-        let app = readingApp()
+        let app = try readingApp()
         app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         app.launch()
 
@@ -130,15 +134,14 @@ final class ReadingFlowTests: XCTestCase {
         XCTAssertEqual(like.label, "取消喜欢")
     }
 
-    func testStyleConfirmationReordersUpcomingArticlesAndPersists() {
-        let app = readingApp()
+    func testStyleConfirmationRequestsNewStreamAndPersists() throws {
+        let app = try readingApp()
         app.launch()
 
         let current = app.buttons["reading.cover.return-to-now"]
         let style = app.buttons["reading.style"]
         XCTAssertTrue(current.waitForExistence(timeout: 8))
         XCTAssertEqual(style.value as? String, "均衡阅读")
-        XCTAssertFalse(app.staticTexts["1 / 5"].exists)
 
         style.tap()
         let psychology = app.buttons["reading.style.psychology"]
@@ -167,8 +170,8 @@ final class ReadingFlowTests: XCTestCase {
         XCTAssertEqual(style.value as? String, "心理觉察")
     }
 
-    func testEmptyResponseOffersRetryWithoutBundledArticles() {
-        let app = readingApp(response: "[]")
+    func testEmptyResponseOffersRetryWithoutBundledArticles() throws {
+        let app = try readingApp(responses: ["/api/v1/articles?style=balanced": ["status": 204]])
         app.launch()
 
         XCTAssertTrue(app.staticTexts["暂时没有文章"].waitForExistence(timeout: 8))
@@ -178,11 +181,58 @@ final class ReadingFlowTests: XCTestCase {
         XCTAssertFalse(app.buttons["reading.open"].firstMatch.exists)
     }
 
-    private func readingApp(response: String = testArticleResponse) -> XCUIApplication {
+    func testNextRequestFailureKeepsCurrentArticle() throws {
+        var responses = try articleResponses()
+        responses["/api/v1/articles?style=balanced&cursor=balanced-1"] = ["status": 503]
+        let app = try readingApp(responses: responses)
+        app.launch()
+
+        let current = app.buttons["reading.cover.return-to-now"]
+        let retry = app.buttons["reading.next"]
+        XCTAssertTrue(current.waitForExistence(timeout: 8))
+        XCTAssertTrue(retry.waitForExistence(timeout: 5))
+        XCTAssertEqual(retry.label, "重试下一篇")
+        retry.tap()
+        XCTAssertTrue(current.isHittable)
+        XCTAssertEqual(retry.label, "重试下一篇")
+    }
+
+    private typealias Responses = [String: [String: Any]]
+
+    private func readingApp(responses: Responses? = nil) throws -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment["LIUBAI_UI_TEST_LIBRARY"] = UUID().uuidString
-        app.launchEnvironment["LIUBAI_UI_TEST_ARTICLES"] = Data(response.utf8).base64EncodedString()
+        try installResponses(responses ?? articleResponses(), in: app)
         return app
+    }
+
+    private func installResponses(_ responses: Responses, in app: XCUIApplication) throws {
+        app.launchEnvironment["LIUBAI_UI_TEST_RESPONSES"] = try JSONSerialization.data(withJSONObject: responses).base64EncodedString()
+    }
+
+    private func articleResponses(firstPageOnly: Bool = false) throws -> Responses {
+        let articles = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(testArticleResponse.utf8)) as? [[String: Any]])
+        let path = "/api/v1/articles"
+        let orders = ["balanced": firstPageOnly ? [0] : [0, 1, 2, 3, 4], "psychology": [0, 2, 4, 1, 3]]
+        var responses: Responses = [:]
+        for (style, order) in orders {
+            for (index, articleIndex) in order.enumerated() {
+                let base = "\(path)?style=\(style)"
+                let request = index == 0 ? base : "\(base)&cursor=\(style)-\(index)"
+                let cursor: Any = index + 1 < order.count ? "\(style)-\(index + 1)" as Any : NSNull()
+                let page: [String: Any] = ["article": articles[articleIndex], "nextCursor": cursor]
+                responses[request] = ["status": 200, "body": try jsonBody(page)]
+            }
+        }
+        for article in articles {
+            let id = try XCTUnwrap(article["id"] as? String)
+            responses["\(path)/\(id)"] = ["status": 200, "body": try jsonBody(article)]
+        }
+        return responses
+    }
+
+    private func jsonBody(_ value: [String: Any]) throws -> String {
+        String(decoding: try JSONSerialization.data(withJSONObject: value), as: UTF8.self)
     }
 
     private func capture(_ name: String, _ app: XCUIApplication) {

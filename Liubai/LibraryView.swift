@@ -193,17 +193,56 @@ private struct ShelfArticleRow: View {
     let icon: String
 
     var body: some View {
-        if let article = feed.article(id) {
-            NavigationLink {
-                ArticleView(article: article)
-            } label: {
+        let reference = library.data.references[id]
+        NavigationLink {
+            ShelfArticleDetail(id: id)
+        } label: {
+            if let article = feed.article(id) {
                 ShelfRow(icon: icon, title: article.displayTitle,
                          detail: "\(article.category) · \(article.minutes) 分钟阅读")
+            } else {
+                ShelfRow(icon: icon, title: reference?.title ?? "已保存的文章",
+                         detail: reference?.category ?? "查看正文")
             }
-            .buttonStyle(.plain)
-        } else {
-            ShelfRow(icon: icon, title: library.data.references[id]?.title ?? "已保存的文章",
-                     detail: "正文暂不可用", trailing: nil)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("library.article.\(id)")
+    }
+}
+
+private struct ShelfArticleDetail: View {
+    @Environment(ArticleFeed.self) private var feed
+    let id: String
+    @State private var error: String?
+
+    var body: some View {
+        VStack(spacing: 0) {
+            if let article = feed.article(id) {
+                ArticleView(article: article)
+            } else if let error {
+                ContentUnavailableView {
+                    Label("正文暂不可用", systemImage: "book.closed")
+                } description: {
+                    Text(error)
+                } actions: {
+                    Button("重新加载") { Task { await load() } }
+                        .buttonStyle(.glass)
+                }
+            } else {
+                ProgressView("正在加载文章")
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .readingBackground()
+        .task { await load() }
+    }
+
+    private func load() async {
+        error = nil
+        do {
+            try await feed.loadArticle(id)
+        } catch {
+            if !Task.isCancelled { self.error = ArticleFeed.message(for: error) }
         }
     }
 }

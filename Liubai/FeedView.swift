@@ -6,7 +6,6 @@ struct FeedView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Binding var appearance: Appearance
     @AppStorage("readingStyle") private var style = ReadingStyle.balanced
-    @State private var articles: [Article] = []
     @State private var activeID: String?
     @State private var showingStyles = false
     @State private var openedArticle: Article?
@@ -14,23 +13,17 @@ struct FeedView: View {
     @State private var error: String?
 
     private var index: Int {
-        articles.firstIndex(where: { $0.id == activeID }) ?? 0
+        feed.articles.firstIndex(where: { $0.id == activeID }) ?? 0
     }
 
     var body: some View {
         VStack(spacing: 0) {
             header
-            switch feed.state {
-            case .idle, .loading:
-                ProgressView("正在加载文章")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            case .ready:
+            if feed.articles.isEmpty {
+                initialContent
+            } else {
                 pages
-                if articles.count > 1 { nextButton }
-            case .empty:
-                feedMessage("暂时没有文章", symbol: "book.closed", detail: "稍后再来看看。")
-            case .failed(let detail):
-                feedMessage("文章加载失败", symbol: "exclamationmark.circle", detail: detail)
+                nextButton
             }
         }
         .readingWidth()
@@ -39,21 +32,38 @@ struct FeedView: View {
         .navigationDestination(item: $openedArticle) { ArticleView(article: $0) }
         .sheet(item: $collectingArticle) { CollectionSheet(article: $0) }
         .sheet(isPresented: $showingStyles) {
-            ReadingStyleSheet(style: style, onConfirm: applyStyle)
+            ReadingStyleSheet(style: style) { style = $0 }
         }
-        .onChange(of: feed.articles, initial: true) { _, newArticles in
-            articles = style.prioritized(newArticles)
-            activeID = articles.first?.id
+        .onChange(of: style, initial: true) { _, selection in
+            feed.selectStyle(selection, keeping: activeID)
+            prefetchIfNeeded()
         }
+        .onChange(of: feed.articles.first?.id, initial: true) { _, firstID in
+            if activeID == nil { activeID = firstID }
+        }
+        .onChange(of: activeID) { prefetchIfNeeded() }
         .task { if let storageError = library.storageError { error = storageError } }
         .messageAlert($error)
+    }
+
+    @ViewBuilder
+    private var initialContent: some View {
+        switch feed.state {
+        case .idle, .loading, .ready:
+            ProgressView("正在加载文章")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        case .end:
+            feedMessage("暂时没有文章", symbol: "book.closed", detail: "稍后再来看看。")
+        case .failed(let detail):
+            feedMessage("文章加载失败", symbol: "exclamationmark.circle", detail: detail)
+        }
     }
 
     private var pages: some View {
         GeometryReader { geometry in
             ScrollView(.vertical) {
                 LazyVStack(spacing: 0) {
-                    ForEach(Array(articles.enumerated()), id: \.element.id) { index, article in
+                    ForEach(Array(feed.articles.enumerated()), id: \.element.id) { index, article in
                         preview(article, index: index, height: geometry.size.height)
                             .frame(height: geometry.size.height)
                             .id(article.id)
@@ -117,26 +127,39 @@ struct FeedView: View {
     }
 
     private var nextButton: some View {
-        let isLast = index == articles.count - 1
-        return Button {
-            if isLast {
-                articles = style.prioritized(feed.articles)
-                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.28)) {
-                    activeID = articles.first?.id
-                }
+        Group {
+            if index < feed.articles.count - 1 {
+                footerButton("下一篇", symbol: "chevron.up") { move(by: 1) }
             } else {
-                move(by: 1)
+                switch feed.state {
+                case .idle, .ready:
+                    footerButton("加载下一篇", symbol: "chevron.up", action: feed.prefetchNext)
+                case .loading:
+                    ProgressView("正在加载下一篇")
+                case .failed:
+                    footerButton("重试下一篇", symbol: "arrow.clockwise", action: feed.retryNext)
+                case .end:
+                    if index > 0 {
+                        footerButton("回到第一篇", symbol: "arrow.counterclockwise") { move(by: -index) }
+                    } else {
+                        Text("暂无更多文章")
+                    }
+                }
             }
-        } label: {
-            Label(isLast ? "回到第一篇" : "下一篇", systemImage: isLast ? "arrow.counterclockwise" : "chevron.up")
-                .font(.caption.weight(.medium))
-                .foregroundStyle(ReadingPalette.muted)
+        }
+        .font(.caption.weight(.medium))
+        .foregroundStyle(ReadingPalette.muted)
+        .frame(maxWidth: .infinity, minHeight: 44, alignment: .trailing)
+        .padding(.horizontal, 24)
+    }
+
+    private func footerButton(_ title: String, symbol: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: symbol)
                 .frame(minHeight: 44)
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("reading.next")
-        .frame(maxWidth: .infinity, alignment: .trailing)
-        .padding(.horizontal, 24)
     }
 
     private func feedMessage(_ title: String, symbol: String, detail: String) -> some View {
@@ -145,29 +168,22 @@ struct FeedView: View {
         } description: {
             Text(detail)
         } actions: {
-            Button("重新加载") { Task { await feed.refresh() } }
+            Button("重新加载", action: feed.retryNext)
                 .buttonStyle(.glass)
                 .accessibilityIdentifier("reading.retry")
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private func applyStyle(_ selection: ReadingStyle) {
-        guard selection != style else { return }
-        style = selection
-        guard !articles.isEmpty else { return }
-
-        let visible = Array(articles.prefix(index + 1))
-        let visibleIDs = Set(visible.map(\.id))
-        let remaining = feed.articles.filter { !visibleIDs.contains($0.id) }
-        articles = visible + selection.prioritized(remaining)
+    private func prefetchIfNeeded() {
+        if index >= feed.articles.count - 1 { feed.prefetchNext() }
     }
 
     private func move(by amount: Int) {
         let target = index + amount
-        guard articles.indices.contains(target) else { return }
+        guard feed.articles.indices.contains(target) else { return }
         withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.28)) {
-            activeID = articles[target].id
+            activeID = feed.articles[target].id
         }
     }
 
