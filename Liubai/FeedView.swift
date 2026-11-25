@@ -78,19 +78,7 @@ struct FeedView: View {
     }
 
     private var pager: some View {
-        HStack(spacing: 10) {
-            HStack(spacing: 4) {
-                ForEach(0..<min(feed.articles.count, 8), id: \.self) { dot in
-                    Capsule().fill(dot == index % 8 ? ReadingPalette.accent : ReadingPalette.rule)
-                        .frame(width: dot == index % 8 ? 16 : 5, height: 4)
-                }
-            }
-            .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: index)
-            .accessibilityHidden(true)
-            Text("\(index + 1) / \(feed.articles.count)")
-                .font(.system(.caption2, design: .monospaced).weight(.medium))
-                .foregroundStyle(ReadingPalette.muted)
-                .accessibilityLabel("第 \(index + 1) 篇，共 \(feed.articles.count) 篇")
+        HStack {
             Spacer()
             Button {
                 move(by: index == feed.articles.count - 1 ? -index : 1)
