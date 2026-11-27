@@ -10,6 +10,9 @@
 		000000000000000000000002 /* ArticleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000001 /* ArticleView.swift */; };
 		000000000000000000000004 /* Articles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000003 /* Articles.swift */; };
 		000000000000000000000006 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000005 /* FeedView.swift */; };
+		000000000000000000000042 /* MiniGames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000041 /* MiniGames.swift */; };
+		000000000000000000000044 /* NumberMerge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000043 /* NumberMerge.swift */; };
+		000000000000000000000046 /* PianoRhythm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000045 /* PianoRhythm.swift */; };
 		000000000000000000000008 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000007 /* LibraryView.swift */; };
 		00000000000000000000000A /* LiubaiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000009 /* LiubaiApp.swift */; };
 		00000000000000000000000C /* NoteEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000000B /* NoteEditor.swift */; };
@@ -39,6 +42,9 @@
 		000000000000000000000001 /* ArticleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleView.swift; sourceTree = "<group>"; };
 		000000000000000000000003 /* Articles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Articles.swift; sourceTree = "<group>"; };
 		000000000000000000000005 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
+		000000000000000000000041 /* MiniGames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniGames.swift; sourceTree = "<group>"; };
+		000000000000000000000043 /* NumberMerge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberMerge.swift; sourceTree = "<group>"; };
+		000000000000000000000045 /* PianoRhythm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PianoRhythm.swift; sourceTree = "<group>"; };
 		000000000000000000000007 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		000000000000000000000009 /* LiubaiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiubaiApp.swift; sourceTree = "<group>"; };
 		00000000000000000000000B /* NoteEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteEditor.swift; sourceTree = "<group>"; };
@@ -73,6 +79,9 @@
 				000000000000000000000001 /* ArticleView.swift */,
 				000000000000000000000003 /* Articles.swift */,
 				000000000000000000000005 /* FeedView.swift */,
+				000000000000000000000041 /* MiniGames.swift */,
+				000000000000000000000043 /* NumberMerge.swift */,
+				000000000000000000000045 /* PianoRhythm.swift */,
 				000000000000000000000007 /* LibraryView.swift */,
 				000000000000000000000009 /* LiubaiApp.swift */,
 				00000000000000000000000B /* NoteEditor.swift */,
@@ -210,6 +219,9 @@
 				000000000000000000000002 /* ArticleView.swift in Sources */,
 				000000000000000000000004 /* Articles.swift in Sources */,
 				000000000000000000000006 /* FeedView.swift in Sources */,
+				000000000000000000000042 /* MiniGames.swift in Sources */,
+				000000000000000000000044 /* NumberMerge.swift in Sources */,
+				000000000000000000000046 /* PianoRhythm.swift in Sources */,
 				000000000000000000000008 /* LibraryView.swift in Sources */,
 				00000000000000000000000A /* LiubaiApp.swift in Sources */,
 				00000000000000000000000C /* NoteEditor.swift in Sources */,

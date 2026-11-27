@@ -1,19 +1,54 @@
 import SwiftUI
 
+private enum FeedPage: Identifiable {
+    enum ID: Hashable {
+        case article(String), game(String)
+
+        var articleID: String {
+            switch self {
+            case .article(let id), .game(let id): id
+            }
+        }
+    }
+
+    case article(Article, index: Int)
+    case game(MiniGame, after: String)
+
+    var id: ID {
+        switch self {
+        case .article(let article, _): .article(article.id)
+        case .game(_, let anchor): .game(anchor)
+        }
+    }
+}
+
 struct FeedView: View {
     @Environment(ArticleFeed.self) private var feed
     @Environment(ReadingStore.self) private var library
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Binding var appearance: Appearance
     @AppStorage("readingStyle") private var style = ReadingStyle.balanced
-    @State private var activeID: String?
+    @State private var activeID: FeedPage.ID?
     @State private var showingStyles = false
     @State private var openedArticle: Article?
+    @State private var openedGame: MiniGame?
     @State private var collectingArticle: Article?
     @State private var error: String?
 
+    private var entries: [FeedPage] {
+        var pages: [FeedPage] = []
+        for (index, article) in feed.articles.enumerated() {
+            pages.append(.article(article, index: index))
+            let number = index + 1
+            if number.isMultiple(of: 3) {
+                pages.append(.game(number.isMultiple(of: 6) ? .piano : .numbers, after: article.id))
+            }
+        }
+        return pages
+    }
+
     private var index: Int {
-        feed.articles.firstIndex(where: { $0.id == activeID }) ?? 0
+        entries.firstIndex(where: { $0.id == activeID }) ?? 0
     }
 
     var body: some View {
@@ -30,16 +65,17 @@ struct FeedView: View {
         .readingBackground()
         .toolbarVisibility(.hidden, for: .navigationBar)
         .navigationDestination(item: $openedArticle) { ArticleView(article: $0) }
+        .navigationDestination(item: $openedGame) { MiniGameScreen(game: $0) }
         .sheet(item: $collectingArticle) { CollectionSheet(article: $0) }
         .sheet(isPresented: $showingStyles) {
             ReadingStyleSheet(style: style) { style = $0 }
         }
         .onChange(of: style, initial: true) { _, selection in
-            feed.selectStyle(selection, keeping: activeID)
+            feed.selectStyle(selection, keeping: activeID?.articleID)
             prefetchIfNeeded()
         }
         .onChange(of: feed.articles.first?.id, initial: true) { _, firstID in
-            if activeID == nil { activeID = firstID }
+            if activeID == nil { activeID = firstID.map(FeedPage.ID.article) }
         }
         .onChange(of: activeID) { prefetchIfNeeded() }
         .task { if let storageError = library.storageError { error = storageError } }
@@ -63,22 +99,32 @@ struct FeedView: View {
         GeometryReader { geometry in
             ScrollView(.vertical) {
                 LazyVStack(spacing: 0) {
-                    ForEach(Array(feed.articles.enumerated()), id: \.element.id) { index, article in
-                        preview(article, index: index, height: geometry.size.height)
+                    ForEach(entries) { entry in
+                        page(entry, height: geometry.size.height)
                             .frame(height: geometry.size.height)
-                            .id(article.id)
+                            .id(entry.id)
                     }
                 }
                 .scrollTargetLayout()
             }
             .scrollIndicators(.hidden)
             .scrollTargetBehavior(.paging)
-            .scrollPosition(id: $activeID)
+            .scrollPosition(id: $activeID, anchor: .top)
             .accessibilityIdentifier("reading.feed")
             .accessibilityScrollAction { direction in
                 if direction == .top { move(by: 1) }
                 if direction == .bottom { move(by: -1) }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func page(_ entry: FeedPage, height: CGFloat) -> some View {
+        switch entry {
+        case .article(let article, let index):
+            preview(article, index: index, height: height)
+        case .game(let game, _):
+            MiniGameCard(game: game, height: height) { openedGame = game }
         }
     }
 
@@ -128,8 +174,12 @@ struct FeedView: View {
 
     private var nextButton: some View {
         Group {
-            if index < feed.articles.count - 1 {
-                footerButton("下一篇", symbol: "chevron.up") { move(by: 1) }
+            if entries.indices.contains(index + 1) {
+                let title = switch entries[index + 1] {
+                case .article: "下一篇"
+                case .game: "下一项"
+                }
+                footerButton(title, symbol: "chevron.up") { move(by: 1) }
             } else {
                 switch feed.state {
                 case .idle, .ready:
@@ -176,14 +226,16 @@ struct FeedView: View {
     }
 
     private func prefetchIfNeeded() {
-        if index >= feed.articles.count - 1 { feed.prefetchNext() }
+        let currentArticle = activeID?.articleID ?? feed.articles.first?.id
+        if currentArticle == feed.articles.last?.id { feed.prefetchNext() }
     }
 
     private func move(by amount: Int) {
         let target = index + amount
-        guard feed.articles.indices.contains(target) else { return }
+        let pages = entries
+        guard pages.indices.contains(target) else { return }
         withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.28)) {
-            activeID = feed.articles[target].id
+            activeID = pages[target].id
         }
     }
 
